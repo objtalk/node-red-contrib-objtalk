@@ -1,0 +1,200 @@
+<script type="text/html" data-template-name="objtalk-server">
+	<div class="form-row">
+		<label for="node-config-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-config-input-name" placeholder="Name" />
+	</div>
+	<div class="form-row">
+		<label for="node-config-input-url"><i class="fa fa-globe"></i> <span>Url</span></label>
+		<input type="text" id="node-config-input-url" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk query">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-pattern"><i class="fa fa-tasks"></i> <span>Pattern</span></label>
+		<input type="text" id="node-input-pattern" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk set">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-object"><i class="fa fa-tasks"></i> <span>Object</span></label>
+		<input type="text" id="node-input-object" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk patch">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-object"><i class="fa fa-tasks"></i> <span>Object</span></label>
+		<input type="text" id="node-input-object" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk emit">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-object"><i class="fa fa-tasks"></i> <span>Object</span></label>
+		<input type="text" id="node-input-object" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-event"><span>Event</span></label>
+		<input type="text" id="node-input-event" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk get">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-pattern"><i class="fa fa-tasks"></i> <span>Pattern</span></label>
+		<input type="text" id="node-input-pattern" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-destination"><i class="fa fa-ellipsis-h"></i> <span>Destination</span></label>
+		<input type="text" id="node-input-destination" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType("objtalk-server", {
+		category: "config",
+		defaults: {
+			name: { value: "" },
+			url: { value: "", required: true },
+		},
+		label: function () {
+			return this.name || this.url;
+		},
+	});
+	
+	RED.nodes.registerType("objtalk query", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			pattern: { value: "", required: true },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 0,
+		outputs: 5,
+		outputLabels: ["update", "add", "change", "remove", "event"],
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || this.pattern || "objtalk query";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk set", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			object: { value: "" },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 1,
+		outputs: 0,
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || ("set " + this.object).trim() || "objtalk set";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk patch", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			object: { value: "" },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 1,
+		outputs: 0,
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || ("patch " + this.object).trim() || "objtalk patch";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk emit", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			object: { value: "" },
+			event: { value: "" },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 1,
+		outputs: 0,
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || ("emit " + this.object + " " + this.event).trim() || "objtalk emit";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk get", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			pattern: { value: "" },
+			destination: { value: "payload", required: true },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 1,
+		outputs: 1,
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || ("get " + this.pattern).trim() || "objtalk get";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+</script>

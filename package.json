@@ -1,0 +1,16 @@
+{
+	"name": "node-red-contrib-objtalk",
+	"version": "0.1.0",
+	"description": "",
+	"author": "hinzundcode <chris-git@appucino.de>",
+  "license": "MIT",
+	"dependencies": {
+		"objtalk": "0.1.0",
+		"ws": "7.4"
+	},
+	"node-red": {
+		"nodes": {
+			"objtalk": "objtalk.js"
+		}
+	}
+}
