@@ -4,6 +4,7 @@
 	"description": "",
 	"author": "hinzundcode <chris-git@appucino.de>",
   "license": "MIT",
+  "keywords": ["node-red"],
 	"dependencies": {
 		"objtalk": "0.1.0",
 		"ws": "7.4"
