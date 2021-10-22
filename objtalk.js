@@ -1,6 +1,5 @@
 module.exports = async (RED) => {
-	const { Connection, WebsocketTransport } = require("objtalk");
-	const WebSocket = require("ws");
+	const { Connection } = require("./lib/objtalk.js");
 	
 	function setConnectionStatus(node, serverConn) {
 		if (serverConn.connection.open)
@@ -21,7 +20,7 @@ module.exports = async (RED) => {
 		RED.nodes.createNode(this, n);
 		
 		this.url = n.url;
-		this.connection = new Connection(() => new WebsocketTransport(new WebSocket(this.url)));
+		this.connection = new Connection(this.url);
 	}
 	
 	function ObjtalkQueryNode(n) {
@@ -42,9 +41,7 @@ module.exports = async (RED) => {
 					let msg = {
 						event: "add",
 						initial: true,
-						name: object.name,
-						payload: object.value,
-						lastModified: object.lastModified,
+						payload: object,
 					};
 					this.send([null, msg, null, null, null]);
 				}
@@ -65,9 +62,7 @@ module.exports = async (RED) => {
 			this.query.addEventListener("add", object => {
 				let msg = {
 					event: "add",
-					name: object.name,
-					payload: object.value,
-					lastModified: object.lastModified,
+					payload: object,
 				};
 				this.send([null, msg, null, null, null]);
 			});
@@ -75,9 +70,7 @@ module.exports = async (RED) => {
 			this.query.addEventListener("change", object => {
 				let msg = {
 					event: "change",
-					name: object.name,
-					payload: object.value,
-					lastModified: object.lastModified,
+					payload: object,
 				};
 				this.send([null, null, msg, null, null]);
 			});
@@ -85,9 +78,7 @@ module.exports = async (RED) => {
 			this.query.addEventListener("remove", object => {
 				let msg = {
 					event: "remove",
-					name: object.name,
-					payload: object.value,
-					lastModified: object.lastModified,
+					payload: object,
 				};
 				this.send([null, null, null, msg, null]);
 			});
