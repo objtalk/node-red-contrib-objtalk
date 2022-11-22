@@ -67,6 +67,10 @@
 		<label for="node-input-event"><span>Event</span></label>
 		<input type="text" id="node-input-event" />
 	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
 </script>
 
 <script type="text/html" data-template-name="objtalk get">
@@ -82,6 +86,47 @@
 		<label for="node-input-destination"><i class="fa fa-ellipsis-h"></i> <span>Destination</span></label>
 		<input type="text" id="node-input-destination" />
 	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk invoke">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-object"><i class="fa fa-tasks"></i> <span>Object</span></label>
+		<input type="text" id="node-input-object" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-method"><span>Method</span></label>
+		<input type="text" id="node-input-method" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk provide">
+	<div class="form-row">
+		<label for="node-input-server"><i class="fa fa-globe"></i> <span>Server</span></label>
+		<input type="text" id="node-input-server" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-pattern"><i class="fa fa-tasks"></i> <span>Pattern</span></label>
+		<input type="text" id="node-input-pattern" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
+		<input type="text" id="node-input-name" placeholder="Name" />
+	</div>
+</script>
+
+<script type="text/html" data-template-name="objtalk reply">
 	<div class="form-row">
 		<label for="node-input-name"><i class="fa fa-tag"></i> <span>Name</span></label>
 		<input type="text" id="node-input-name" placeholder="Name" />
@@ -192,6 +237,63 @@
 		icon: "bridge.svg",
 		label: function () {
 			return this.name || ("get " + this.object).trim() || "objtalk get";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk invoke", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			object: { value: "" },
+			method: { value: "" },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 1,
+		outputs: 1,
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || ("invoke " + this.object + " " + this.method).trim() || "objtalk invoke";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk provide", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+			pattern: { value: "", required: true },
+			server: { type: "objtalk-server", required: true },
+		},
+		color: "#a0e8ce",
+		inputs: 0,
+		outputs: 1,
+		outputLabels: ["invocation"],
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || ("provide " + this.pattern).trim() || "objtalk provide";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic": "";
+		}
+	});
+	
+	RED.nodes.registerType("objtalk reply", {
+		category: "network",
+		defaults: {
+			name: { value: "" },
+		},
+		color: "#a0e8ce",
+		inputs: 1,
+		outputs: 0,
+		icon: "bridge.svg",
+		label: function () {
+			return this.name || "objtalk reply";
 		},
 		labelStyle: function () {
 			return this.name ? "node_label_italic": "";

@@ -103,6 +103,54 @@ module.exports = async (RED) => {
 		});
 	}
 	
+	function ObjtalkProvideNode(n) {
+		RED.nodes.createNode(this, n);
+		
+		this.pattern = n.pattern;
+		this.server = n.server;
+		this.serverConn = RED.nodes.getNode(this.server);
+		this.query = null;
+		
+		if (this.serverConn) {
+			this.query = this.serverConn.connection.provide(this.pattern, event => {
+				let msg = {
+					object: event.object,
+					objects: event.objects,
+					method: event.method,
+					payload: event.args,
+					_reply: event.reply,
+				};
+				this.send(msg);
+			});
+			
+			this.query.addEventListener("open", objects => {
+				this.status({ fill: "green", shape: "dot", text: "node-red:common.status.connected" });
+				
+				for (let object of objects) {
+					let msg = {
+						event: "add",
+						initial: true,
+						payload: object,
+					};
+					this.send([null, msg, null, null, null]);
+				}
+			});
+			
+			this.query.addEventListener("close", () => {
+				this.status({ fill: "red", shape: "ring", text: "node-red:common.status.disconnected" });
+			});
+		}
+		
+		this.on("close", (removed, done) => {
+			if (this.query) {
+				this.query.stop();
+				this.query = null;
+			}
+			
+			done();
+		});
+	}
+	
 	function ObjtalkSetNode(n) {
 		RED.nodes.createNode(this, n);
 		
@@ -230,10 +278,72 @@ module.exports = async (RED) => {
 		}
 	}
 	
+	function ObjtalkInvokeNode(n) {
+		RED.nodes.createNode(this, n);
+		
+		this.object = n.object;
+		this.method = n.method;
+		this.server = n.server;
+		this.serverConn = RED.nodes.getNode(this.server);
+		
+		if (this.serverConn) {
+			setConnectionStatus(this, this.serverConn);
+			
+			this.on("input", (msg, send, done) => {
+				let object = this.object || msg.object;
+				let method = this.method || msg.method;
+				
+				if (!object) {
+					this.warn("invalid object name");
+					done();
+					return;
+				}
+				
+				if (!method) {
+					this.warn("invalid method name");
+					done();
+					return;
+				}
+				
+				this.serverConn.connection.invoke(object, method, msg.payload)
+					.then(reply => {
+						msg.payload = reply;
+						send(msg);
+						done();
+					})
+					.catch(e => {
+						this.error("can't invoke "+method+" on "+object+": " + e);
+						done();
+					});
+			});
+		}
+	}
+	
+	function ObjtalkReplyNode(n) {
+		RED.nodes.createNode(this, n);
+		
+		this.on("input", (msg, send, done) => {
+			let object = this.object || msg.object;
+			let event = this.event || msg.event;
+			
+			if (!msg._reply) {
+				this.warn("message must come from a objtalk provide node");
+				done();
+				return;
+			}
+			
+			msg._reply(msg.payload);
+			done();
+		});
+	}
+	
 	RED.nodes.registerType("objtalk-server", ObjtalkServerNode);
 	RED.nodes.registerType("objtalk query", ObjtalkQueryNode);
 	RED.nodes.registerType("objtalk get", ObjtalkGetNode);
 	RED.nodes.registerType("objtalk set", ObjtalkSetNode);
 	RED.nodes.registerType("objtalk patch", ObjtalkPatchNode);
 	RED.nodes.registerType("objtalk emit", ObjtalkEmitNode);
+	RED.nodes.registerType("objtalk invoke", ObjtalkInvokeNode);
+	RED.nodes.registerType("objtalk provide", ObjtalkProvideNode);
+	RED.nodes.registerType("objtalk reply", ObjtalkReplyNode);
 };
